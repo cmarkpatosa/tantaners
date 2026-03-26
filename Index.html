@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For My Special Girl</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f0f10, #1a1a1d 45%, #2a2a2f);
+      color: #e7e7ea;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .container {
+      width: min(94%, 900px);
+      margin: 40px auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero, .section {
+      background: rgba(24,24,28,0.92);
+      backdrop-filter: blur(10px);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: clamp(2.1rem, 5vw, 3.5rem);
+      color: #ff4d4f;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #ff5c5f;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 1.08rem;
+      line-height: 1.7;
+      margin: 14px auto 22px;
+      max-width: 650px;
+    }
+
+    .btn-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 20px rgba(0,0,0,0.12);
+    }
+
+    .primary { background: #c1121f; color: white; }
+    .soft { background: #2a2a2f; color: #f0f0f2; border: 1px solid #4a4a52; }
+    .gold { background: #3a3a40; color: #ffb3b3; border: 1px solid #5a5a63; }
+
+    .hidden {
+      display: none;
+    }
+
+    .message-box, .thought-box, .question-box {
+      background: #202026;
+      border: 1px solid #3c3c45;
+      border-radius: 20px;
+      padding: 20px;
+      line-height: 1.8;
+    }
+
+    .reasons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .reason-card {
+      background: linear-gradient(180deg, #202026, #2b2b31);
+      border: 1px solid #43434d;
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: 0.25s ease;
+    }
+
+    .reason-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .reason-title {
+      font-weight: bold;
+      color: #c2185b;
+      margin-bottom: 8px;
+    }
+
+    .final-surprise {
+      text-align: center;
+      font-size: 1.2rem;
+      line-height: 1.8;
+      color: #ff6b6b;
+      font-weight: bold;
+    }
+
+    .floating {
+      position: fixed;
+      font-size: 24px;
+      animation: floatUp linear forwards;
+      opacity: 0.85;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(30px) scale(0.8); opacity: 0; }
+      15% { opacity: 0.9; }
+      100% { transform: translateY(-110vh) scale(1.25); opacity: 0; }
+    }
+
+    .tiny-note {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 0.95rem;
+      color: #b8b8bf;
+    }
+
+    .love-meter {
+      margin-top: 16px;
+      background: #2f2f36;
+      border-radius: 999px;
+      overflow: hidden;
+      height: 18px;
+    }
+
+    .love-fill {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #b11226, #ff4d4f);
+      transition: width 0.8s ease;
+    }
+
+    .center { text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>Hi, Frances — My Lovie Dovie 💖</h1>
+      <p class="subtitle">
+        This little website was made for one very special person — you, Frances.<br>
+        Because some feelings are too beautiful to keep ordinary, especially for my lovie dovie.
+      </p>
+      <div class="btn-wrap">
+        <button class="primary" onclick="startSurprise()">Start the Surprise</button>
+        <button class="soft" onclick="makeHearts(25)">Send You Sweet Hearts</button>
+        <button class="gold" onclick="showThought()">Read a Sweet Thought</button>
+      </div>
+      <div class="love-meter"><div class="love-fill" id="loveFill"></div></div>
+      <p class="tiny-note">Every click fills this page with a little more love.</p>
+    </div>
+
+    <div class="section hidden" id="noteSection">
+      <h2>A Little Love Note</h2>
+      <div class="message-box">
+        Frances, you have this beautiful way of making simple moments feel special.
+        Your smile feels like peace, your presence feels like comfort,
+        and your existence makes life a lot more meaningful.
+        <br><br>
+        In a world full of temporary things, you are one of the feelings I would always want to keep, my lovie dovie.
+      </div>
+    </div>
+
+    <div class="section hidden" id="thoughtSection">
+      <h2>Sweet Thoughts About You</h2>
+      <div class="thought-box" id="thoughtText">
+        Frances is the kind of person who can turn an ordinary day into something worth remembering.
+      </div>
+      <div class="btn-wrap" style="margin-top:14px;">
+        <button class="soft" onclick="nextThought()">Another Sweet Thought</button>
+      </div>
+    </div>
+
+    <div class="section hidden" id="reasonsSection">
+      <h2>Little Reasons Why Frances Is So Special</h2>
+      <p class="center">Tap each card 💕</p>
+      <div class="reasons-grid">
+        <div class="reason-card" onclick="flipReason(this, 'Because your smile feels like sunlight after a long day.')">
+          <div class="reason-title">Your Smile</div>
+          <div>Tap to reveal</div>
+        </div>
+        <div class="reason-card" onclick="flipReason(this, 'Because your kindness makes everything around you softer and warmer.')">
+          <div class="reason-title">Your Heart</div>
+          <div>Tap to reveal</div>
+        </div>
+        <div class="reason-card" onclick="flipReason(this, 'Because your presence makes even silence feel safe and beautiful.')">
+          <div class="reason-title">Your Presence</div>
+          <div>Tap to reveal</div>
+        </div>
+        <div class="reason-card" onclick="flipReason(this, 'Because you are effortlessly lovely in ways words can barely explain.')">
+          <div class="reason-title">Everything About You</div>
+          <div>Tap to reveal</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section hidden" id="questionSection">
+      <h2>One Tiny Question</h2>
+      <div class="question-box center">
+        Frances, do you know how special you are to me?
+        <div class="btn-wrap" style="margin-top:16px;">
+          <button class="primary" onclick="answerYes()">Yes 💗</button>
+          <button class="soft" id="noBtn" onmouseover="moveNoButton()" onclick="moveNoButton()">Not yet 🤍</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section hidden" id="finalSection">
+      <h2>My Final Surprise</h2>
+      <div class="final-surprise">
+        No matter how many words I place on this page,<br>
+        they still won’t be enough to fully describe how lovely you are, Frances.<br><br>
+        But if there is one thing I hope you always remember, it’s this:<br><br>
+        You are deeply appreciated, genuinely admired, and sweetly treasured, my lovie dovie. ❤️
+      </div>
+      <p class="tiny-note">You can personalize every message here with her name and your own story.</p>
+    </div>
+  </div>
+
+  <script>
+    let loveLevel = 0;
+    const thoughts = [
+      'You are the kind of person who can turn an ordinary day into something worth remembering.',
+      'Some people are beautiful by appearance, but you feel beautiful even in the way you exist.',
+      'If calm had a smile, I think it would look a little like yours, Frances.',
+      'You make softness feel strong, and sweetness feel unforgettable.',
+      'The nicest part of today is knowing someone like you exists in it, my lovie dovie.'
+    ];
+    let thoughtIndex = 0;
+
+    function startSurprise() {
+      document.getElementById('noteSection').classList.remove('hidden');
+      document.getElementById('thoughtSection').classList.remove('hidden');
+      document.getElementById('reasonsSection').classList.remove('hidden');
+      document.getElementById('questionSection').classList.remove('hidden');
+      increaseLove(35);
+      makeHearts(30);
+      window.scrollTo({ top: 320, behavior: 'smooth' });
+    }
+
+    function showThought() {
+      document.getElementById('thoughtSection').classList.remove('hidden');
+      nextThought();
+      increaseLove(10);
+      makeHearts(12);
+    }
+
+    function nextThought() {
+      thoughtIndex = (thoughtIndex + 1) % thoughts.length;
+      document.getElementById('thoughtText').innerText = thoughts[thoughtIndex];
+      increaseLove(7);
+    }
+
+    function flipReason(card, text) {
+      card.innerHTML = `<div>${text}</div>`;
+      increaseLove(8);
+      makeHearts(8);
+    }
+
+    function answerYes() {
+      document.getElementById('finalSection').classList.remove('hidden');
+      increaseLove(40);
+      makeHearts(40);
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function moveNoButton() {
+      const btn = document.getElementById('noBtn');
+      const x = Math.floor(Math.random() * 120) - 60;
+      const y = Math.floor(Math.random() * 40) - 20;
+      btn.style.transform = `translate(${x}px, ${y}px)`;
+      makeHearts(5);
+    }
+
+    function increaseLove(value) {
+      loveLevel = Math.min(100, loveLevel + value);
+      document.getElementById('loveFill').style.width = loveLevel + '%';
+    }
+
+    function makeHearts(count) {
+      const icons = ['❤️','🖤','✨','🌹','💋','❣️'];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'floating';
+        el.textContent = icons[Math.floor(Math.random() * icons.length)];
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.bottom = '-20px';
+        el.style.fontSize = (18 + Math.random() * 20) + 'px';
+        el.style.animationDuration = (4 + Math.random() * 4) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 8000);
+      }
+    }
+  </script>
+</body>
+</html>
