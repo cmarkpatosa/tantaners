@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poem Sticky Notes Blog</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f7f3ea;
+      color: #2f2f2f;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+    }
+
+    .header p {
+      margin-top: 8px;
+      color: #666;
+    }
+
+    .panel {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      margin-bottom: 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    input, textarea, button {
+      font: inherit;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #8a7bff;
+      box-shadow: 0 0 0 3px rgba(138, 123, 255, 0.12);
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    button, .file-label {
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover, .file-label:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    .primary { background: #8a7bff; color: white; }
+    .secondary { background: #ffe8a3; color: #333; }
+    .danger { background: #ffb7b7; color: #333; }
+    .neutral { background: #e9ecef; color: #333; }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .toolbar input {
+      max-width: 320px;
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .note {
+      position: relative;
+      min-height: 260px;
+      padding: 18px;
+      border-radius: 8px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+      transform: rotate(-1.5deg);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .note:nth-child(2n) { transform: rotate(1.3deg); }
+    .note:nth-child(3n) { transform: rotate(-0.8deg); }
+    .note:nth-child(4n) { transform: rotate(1.8deg); }
+
+    .note::before {
+      content: "";
+      position: absolute;
+      width: 80px;
+      height: 20px;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-2deg);
+      background: rgba(255,255,255,0.55);
+      border-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .note-title {
+      font-size: 1.15rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      padding-right: 24px;
+    }
+
+    .note-meta {
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 12px;
+    }
+
+    .note-content {
+      white-space: pre-wrap;
+      line-height: 1.5;
+      font-size: 0.97rem;
+      margin-bottom: 14px;
+    }
+
+    .note-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .tiny {
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+    }
+
+    .yellow { background: #fff59d; }
+    .pink { background: #ffd6e7; }
+    .blue { background: #cfe8ff; }
+    .green { background: #d8f8c8; }
+    .peach { background: #ffe0c7; }
+
+    .empty {
+      text-align: center;
+      background: #fff;
+      padding: 30px;
+      border-radius: 14px;
+      color: #666;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        align-items: stretch;
+      }
+
+      .toolbar input {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Poem Sticky Notes Blog</h1>
+      <p>Write poems, save them, export to CSV, and display them like sticky notes.</p>
+    </div>
+
+    <div class="panel">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="title">Poem Title</label>
+          <input type="text" id="title" placeholder="Enter poem title" />
+        </div>
+
+        <div class="form-group">
+          <label for="author">Author</label>
+          <input type="text" id="author" placeholder="Enter author name" />
+        </div>
+
+        <div class="form-group full">
+          <label for="content">Poem Content</label>
+          <textarea id="content" placeholder="Write your poem here..."></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" onclick="savePoem()">Save Poem</button>
+        
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <h2 style="margin:0;">Saved Poems</h2>
+      <input type="text" id="search" placeholder="Search title, author, or content" oninput="renderPoems()" />
+    </div>
+
+    <div id="poemsContainer"></div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'poemStickyNotesBlog';
+    let editingId = null;
+
+    function getPoems() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+
+    function setPoems(poems) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(poems));
+    }
+
+    function randomNoteClass(index) {
+      const colors = ['yellow', 'pink', 'blue', 'green', 'peach'];
+      return colors[index % colors.length];
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      if (isNaN(d)) return '';
+      return d.toLocaleString();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text || '';
+      return div.innerHTML;
+    }
+
+    function clearForm() {
+      document.getElementById('title').value = '';
+      document.getElementById('author').value = '';
+      document.getElementById('content').value = '';
+      editingId = null;
+    }
+
+    function savePoem() {
+      const title = document.getElementById('title').value.trim();
+      const author = document.getElementById('author').value.trim();
+      const content = document.getElementById('content').value.trim();
+
+      if (!title || !content) {
+        alert('Please enter at least the title and poem content.');
+        return;
+      }
+
+      const poems = getPoems();
+      const now = new Date().toISOString();
+
+      if (editingId) {
+        const index = poems.findIndex(p => p.id === editingId);
+        if (index !== -1) {
+          poems[index] = {
+            ...poems[index],
+            title,
+            author,
+            content,
+            updatedAt: now
+          };
+        }
+      } else {
+        poems.unshift({
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          title,
+          author,
+          content,
+          createdAt: now,
+          updatedAt: now
+        });
+      }
+
+      setPoems(poems);
+      clearForm();
+      renderPoems();
+    }
+
+    function editPoem(id) {
+      const poems = getPoems();
+      const poem = poems.find(p => p.id === id);
+      if (!poem) return;
+
+      document.getElementById('title').value = poem.title;
+      document.getElementById('author').value = poem.author;
+      document.getElementById('content').value = poem.content;
+      editingId = id;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deletePoem(id) {
+      const confirmed = confirm('Delete this poem?');
+      if (!confirmed) return;
+
+      const poems = getPoems().filter(p => p.id !== id);
+      setPoems(poems);
+      if (editingId === id) clearForm();
+      renderPoems();
+    }
+
+    function clearAllPoems() {
+      const confirmed = confirm('This will remove all saved poems. Continue?');
+      if (!confirmed) return;
+      localStorage.removeItem(STORAGE_KEY);
+      clearForm();
+      renderPoems();
+    }
+
+    function renderPoems() {
+      const container = document.getElementById('poemsContainer');
+      const search = document.getElementById('search').value.trim().toLowerCase();
+      const poems = getPoems().filter(p => {
+        const joined = `${p.title} ${p.author} ${p.content}`.toLowerCase();
+        return joined.includes(search);
+      });
+
+      if (!poems.length) {
+        container.innerHTML = '<div class="empty">No poems found yet. Add one above.</div>';
+        return;
+      }
+
+      container.innerHTML = `<div class="notes-grid">${poems.map((poem, index) => `
+        <div class="note ${randomNoteClass(index)}">
+          <div class="note-title">${escapeHtml(poem.title)}</div>
+          <div class="note-meta">
+            ${poem.author ? 'By ' + escapeHtml(poem.author) + '<br>' : ''}
+            Saved: ${escapeHtml(formatDate(poem.updatedAt || poem.createdAt))}
+          </div>
+          <div class="note-content">${escapeHtml(poem.content)}</div>
+          <div class="note-buttons">
+            <button class="tiny primary" onclick="editPoem('${poem.id}')">Edit</button>
+            <button class="tiny danger" onclick="deletePoem('${poem.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('')}</div>`;
+    }
+
+    function toCSVValue(value) {
+      const text = String(value ?? '');
+      return '"' + text.replace(/"/g, '""') + '"';
+    }
+
+    function downloadCSV() {
+      const poems = getPoems();
+      if (!poems.length) {
+        alert('No poems to export.');
+        return;
+      }
+
+      const headers = ['id', 'title', 'author', 'content', 'createdAt', 'updatedAt'];
+      const rows = poems.map(poem => headers.map(h => toCSVValue(poem[h])).join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'poems.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const next = line[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+
+      result.push(current);
+      return result;
+    }
+
+    function importCSV(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const text = e.target.result.replace(/\r/g, '');
+          const lines = text.split('\n').filter(line => line.trim() !== '');
+          if (lines.length < 2) {
+            alert('CSV file is empty or invalid.');
+            return;
+          }
+
+          const headers = parseCSVLine(lines[0]).map(h => h.trim());
+          const required = ['id', 'title', 'author', 'content', 'createdAt', 'updatedAt'];
+          const valid = required.every(r => headers.includes(r));
+
+          if (!valid) {
+            alert('Invalid CSV format. Please use an exported CSV from this app.');
+            return;
+          }
+
+          const imported = [];
+          for (let i = 1; i < lines.length; i++) {
+            const values = parseCSVLine(lines[i]);
+            const item = {};
+            headers.forEach((header, index) => {
+              item[header] = values[index] ?? '';
+            });
+            imported.push(item);
+          }
+
+          setPoems(imported);
+          renderPoems();
+          alert('CSV imported successfully.');
+        } catch (err) {
+          alert('Failed to import CSV.');
+          console.error(err);
+        } finally {
+          event.target.value = '';
+        }
+      };
+
+      reader.readAsText(file);
+    }
+
+    renderPoems();
+  </script>
+</body>
+</html>
